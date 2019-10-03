@@ -149,8 +149,8 @@ def stack_frames():
 
 device = 'cuda'
 critic = Critic().to(device)
- 
-critic.load_state_dict(torch.load(r'G:\Kdaus\pyyttoni\Omf_projekti2\critic_models\20190928-182010critic.tar'))
+
+critic.load_state_dict(torch.load(r'G:\Kdaus\pyyttoni\Omf_projekti2\fighter_models\20191001-141044Fighter.tar'))
 critic_optim = optim.Adagrad(critic.parameters(), lr=0.009)
 
 img_stack = deque([screen_preprocess(capture_screen()) for _ in range(4)],
@@ -160,53 +160,36 @@ training = True
 while training:
     cur_screen = capture_screen()
     last_state = ''
-    while tmp_matching(cur_screen, img_tmps['fight_1']):
-        cur_screen = capture_screen
+    for state, tmp in img_tmps.items():
+        if 'fight_' in state and tmp_matching(cur_screen, tmp):
+            fight = True
+            while fight:
+                cur_screen = capture_screen()
+                if not tmp_matching(cur_screen, tmp):
+                    fight = False
+                # img_stack.append(screen_preprocess(cur_screen))
+                stack_frames()
+                img_stack_tensor = torch.tensor(img_stack).float().unsqueeze(0).to(device)
+                score = critic(img_stack_tensor)
+                print(f'Score:{score[0]:.2f}')
 
-        last_state = 'fight'
+    # while fight:
+    #     cur_screen = capture_screen
+    #     for state, tmp in img_tmps.items():
+    #         if 'fight_' in state and tmp_matching(cur_screen, tmp):
+    #             fight = True
+    # cur_screen = capture_screen
+    # stack_frames()
+    # img_stack_tensor = torch.tensor(img_stack).float().unsqueeze(0).to(device)
+    # score = critic(img_stack_tensor)
 
-        keyDown('right')
-        stack_frames()
-        cur_screen = capture_screen()
-        optimize(0., cur_screen)
-        time.sleep(1)
-
-        keyUp('right')
-        stack_frames()
-        cur_screen = capture_screen()
-        optimize(2., cur_screen)
-
-        press(random.choice(['enter', 'shiftright']))
-        stack_frames()
-        cur_screen = capture_screen()
-        optimize(10., cur_screen)
-
-        press(random.choice(['ctrlleft', 'tab']))
-        stack_frames()
-        cur_screen = capture_screen()
-        optimize(-10., cur_screen)
-
-        keyDown('left')
-        stack_frames()
-        cur_screen = capture_screen()
-        optimize(0., cur_screen)
-        time.sleep(1)
-
-        keyUp('left')
-        stack_frames()
-        cur_screen = capture_screen()
-        optimize(0., cur_screen)
-        time.sleep(1)
-
-        press(random.choice(['enter', 'shiftright']))
-        stack_frames()
-        cur_screen = capture_screen()
-        optimize(0., cur_screen)
+    # print(score)
+        
     
-    if last_state == 'fight':
-        save_model()
+    # if last_state == 'fight':
+    #     save_model()
 
-    if tmp_matching(cur_screen, img_tmps['2P_fighter_select']) or tmp_matching(cur_screen, img_tmps['2Player_menu']) or tmp_matching(cur_screen, img_tmps['pre_fight_screen']):
-        last_state = 'select'
-        press('enter')
-        press('ctrlright')
+    # if tmp_matching(cur_screen, img_tmps['2P_fighter_select']) or tmp_matching(cur_screen, img_tmps['2Player_menu']) or tmp_matching(cur_screen, img_tmps['pre_fight_screen']):
+    #     last_state = 'select'
+    #     press('enter')
+    #     press('ctrlright')
