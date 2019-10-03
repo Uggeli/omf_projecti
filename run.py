@@ -173,7 +173,7 @@ EPS_DECAY = 200
 steps_done = 0
 device = 'cuda'
 
-model_to_load = r'G:\Kdaus\pyyttoni\Omf_projekti2\fighter_models\20191002-185400Fighter.tar'
+model_to_load = '20191002-210426Fighter.tar'
 
 player1 = Fighter().to(device)
 player1_target = Fighter().to(device)
@@ -220,7 +220,7 @@ while training:
         p1_total_score = []
 
         player1_target.load_state_dict(player1.state_dict())
-        save_model(player1)
+        
 
         p1_action = torch.tensor([[random.randrange(6)]],
                                  device=device,
